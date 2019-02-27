@@ -4,12 +4,18 @@ const router = require("express").Router();
 const fs = require("fs");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" }); // destination folder for saving uploaded files -> ./uploads/
+const log = require("./logger").logger;
 
-// [{"userID": [{
-//     "fileName": "",
-//     "PAN": "",
-//     "count": ""
-// }]}]
+var x = {
+    userID: "",
+    data: [
+        {
+            fileName: "",
+            PAN: "",
+            count: ""
+        }
+    ]
+};
 
 router
     .route("/profile")
@@ -21,12 +27,20 @@ router
             const words = content.split(" ");
             const pans = {};
             var count = 0;
-            const maskedContent = words.map((word) => {
+            const maskedContent = words.map(word => {
                 if (word.search(/[A-Za-z]{5}\d{4}[A-Za-z]{1}/) !== -1) {
                     pans[word] = (pans[word] || 0) + 1;
                     count = count + 1;
                     return `${count}) PAN number found: **********`;
                 }
+            });
+            log.info({
+                Data: [
+                    {
+                        fileName: fileName,
+                        count: count
+                    }
+                ]
             });
             const newFile = maskedContent.join(" ").replace(/\s\s+/g, "\n");
             res.setHeader(

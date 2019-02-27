@@ -4,6 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const hbs = require('express-handlebars');
 
+const log = require('./app/api/logger').init();
+
 const api = require('./app/index');
 const app = express();
 
@@ -25,7 +27,7 @@ app.use((req, res, next) => {
 // api routes
 app.use('/', api);
 
-const server = app.listen(port, () => {
+app.listen(port, () => {
     console.log("Server started!! Please visit:",
         '\x1b[36m',
         "http://localhost:" + port,
