@@ -1,44 +1,29 @@
 "use strict";
 
 const { createLogger, format, transports } = require("winston");
+require("winston-daily-rotate-file");
 const { combine, colorize, timestamp, printf } = format;
 
-// const DailyRotateFile = require("winston-daily-rotate-file");
-
 const customFormat = printf(info => {
-    return `[${info.timestamp}] ${info.level}: ${info.message}`;
+    return `[${info.timestamp}]: ${info.message}`;
 });
 
 module.exports = {
     init: function() {
-        this.logger = createLogger({
-            level: "info",
-            format: combine(timestamp(), format.json()),
-            transports: [
-                new transports.Console(),
-                // Write to all logs with level `info` and below to `PANData.log`
-                new transports.File({ filename: "PANData.log" })
-            ]
+        this.transport = new transports.DailyRotateFile({
+            filename: "PANData-%DATE%.log",
+            datePattern: "YYYY-MM-DD-HH",
+            zippedArchive: true,
+            maxSize: "20m",
+            maxFiles: "14d"
         });
 
-        // If we're not in production then log to the `console` with the format:
-        if (process.env.NODE_ENV !== "production") {
-            this.logger.add(
-                new transports.Console({
-                    colorize: true,
-                    format: combine(colorize(), timestamp(), customFormat)
-                })
-            );
-        }
+        this.logger = createLogger({
+            level: "info",
+            format: combine(colorize(), timestamp(), customFormat),
+            transports: [this.transport]
+        });
 
-        // this.logger.configure({
-        //     level: "verbose",
-        //     transports: [
-        //         new DailyRotateFile({
-        //             colorize: true,
-        //         })
-        //     ]
-        // });
         return this.logger;
     }
 };
