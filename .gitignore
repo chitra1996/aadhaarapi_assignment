@@ -12,3 +12,4 @@ sample.txt
 *.pid
 npm-debug.log
 .vscode/launch.json
+uploads/*

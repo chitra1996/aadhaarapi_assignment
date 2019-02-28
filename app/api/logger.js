@@ -3,6 +3,8 @@
 const { createLogger, format, transports } = require("winston");
 const { combine, colorize, timestamp, printf } = format;
 
+// const DailyRotateFile = require("winston-daily-rotate-file");
+
 const customFormat = printf(info => {
     return `[${info.timestamp}] ${info.level}: ${info.message}`;
 });
@@ -19,12 +21,6 @@ module.exports = {
             ]
         });
 
-        // const DailyRotateFile = require("winston-daily-rotate-file");
-        // this.logger.configure({
-        //     level: "verbose",
-        //     transports: [new DailyRotateFile()]
-        // });
-
         // If we're not in production then log to the `console` with the format:
         if (process.env.NODE_ENV !== "production") {
             this.logger.add(
@@ -34,6 +30,15 @@ module.exports = {
                 })
             );
         }
+
+        // this.logger.configure({
+        //     level: "verbose",
+        //     transports: [
+        //         new DailyRotateFile({
+        //             colorize: true,
+        //         })
+        //     ]
+        // });
         return this.logger;
     }
 };

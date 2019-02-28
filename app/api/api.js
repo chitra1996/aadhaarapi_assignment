@@ -5,6 +5,7 @@ const fs = require("fs");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" }); // destination folder for saving uploaded files -> ./uploads/
 const log = require("./logger").logger;
+const config = require("../../config");
 
 var x = {
     userID: "",
@@ -34,23 +35,41 @@ router
                     return `${count}) PAN number found: **********`;
                 }
             });
-            log.info({
-                Data: [
-                    {
-                        fileName: fileName,
-                        count: count
-                    }
-                ]
-            });
             const newFile = maskedContent.join(" ").replace(/\s\s+/g, "\n");
-            res.setHeader(
-                "Content-disposition",
-                "attachment; filename=PANData.txt"
-            );
-            res.setHeader("Content-type", "text/plain");
-            res.charset = "UTF-8";
-            res.write(newFile);
-            res.end();
+            if (count <= config.configValue && newFile.length > 5) {
+                log.info({
+                    Data: [
+                        {
+                            fileName: fileName,
+                            count: count,
+                            status: "uploaded"
+                        }
+                    ]
+                });
+                res.setHeader(
+                    "Content-disposition",
+                    "attachment; filename=PANData.txt"
+                );
+                res.setHeader("Content-type", "text/plain");
+                res.charset = "UTF-8";
+                res.write(newFile);
+                res.end();
+            } else {
+                log.info({
+                    Data: [
+                        {
+                            fileName: fileName,
+                            count: count,
+                            status: "file contains too many PANs"
+                        }
+                    ]
+                });
+                res.writeHead(200, { "Content-Type": "text/html" });
+                res.write(
+                    "<p id='result1'>Error: file contains no PAN or too many PANs</p>"
+                );
+                res.end();
+            }
         });
     });
 

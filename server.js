@@ -9,7 +9,7 @@ const log = require('./app/api/logger').init();
 const api = require('./app/index');
 const app = express();
 
-const port = process.env.PORT || 5000;
+const config = require('./config');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -27,10 +27,10 @@ app.use((req, res, next) => {
 // api routes
 app.use('/', api);
 
-app.listen(port, () => {
+app.listen(config.port, () => {
     console.log("Server started!! Please visit:",
         '\x1b[36m',
-        "http://localhost:" + port,
+        "http://localhost:" + config.port,
         '\x1b[0m');
 });
 
