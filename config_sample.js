@@ -3,9 +3,9 @@
 module.exports = {
     logLevel: 'debug', // error, warn, info, verbose, debug, silly
     baseUrl: '', // No trailing slashes
-    port: process.env.PORT || 8080,
+    port: process.env.PORT || 3000,
     env: process.env.NODE_ENV || 'development',
-    configValue: 20,
+    maxValue: 20,
     mail: {
         host: '',
         port: 587,

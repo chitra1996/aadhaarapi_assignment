@@ -1,29 +1,27 @@
 "use strict";
 
-const { createLogger, format, transports } = require("winston");
-require("winston-daily-rotate-file");
-const { combine, colorize, timestamp, printf } = format;
-
-const customFormat = printf(info => {
-    return `[${info.timestamp}]: ${info.message}`;
-});
+const fs = require("fs");
 
 module.exports = {
     init: function() {
-        this.transport = new transports.DailyRotateFile({
-            filename: "PANData-%DATE%.log",
-            datePattern: "YYYY-MM-DD-HH",
-            zippedArchive: true,
-            maxSize: "20m",
-            maxFiles: "14d"
-        });
+        this.path = `PANData_${new Date().toISOString().split("T")[0]}.log`;
 
-        this.logger = createLogger({
-            level: "info",
-            format: combine(colorize(), timestamp(), customFormat),
-            transports: [this.transport]
-        });
-
-        return this.logger;
+        if (!fs.existsSync(this.path)) {
+            const logFile = fs.createWriteStream(this.path);
+            logFile.write('{"Total_PAN_Count": 0 , "Logs": []}');
+            logFile.end();
+            console.log("File created");
+        } else {
+            const logFile = fs.readFile(this.path, "utf8", (err, data) => {
+                if (data.length < 5) {
+                    const logFile = fs.createWriteStream(this.path);
+                    logFile.write('{"Total_PAN_Count": 0 , "Logs": []}');
+                    logFile.end();
+                    console.log("New file created");
+                } else {
+                    console.log("File exists");
+                }
+            });
+        }
     }
 };
